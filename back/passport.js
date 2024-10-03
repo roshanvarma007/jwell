@@ -1,6 +1,7 @@
 const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth2').Strategy
 const LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
+const jwt = require('jsonwebtoken');
 const User = require('./schema/UserSchema')
 
 passport.serializeUser((user,done)=>{
@@ -14,11 +15,11 @@ passport.deserializeUser(function(user,done){
 passport.use(new GoogleStrategy({
     clientID: "487161400249-k9nkdcsg8ul6cpuj05b7n5smobfj7ee9.apps.googleusercontent.com",
     clientSecret: "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",
-    callbackURL: "http://localhost:3000/auth/callback",
-    passReqToCallback: true 
+    callbackURL: "https://back-alpha-amber.vercel.app/auth/callback",
+    // passReqToCallback: true 
 },
 async function(request, accesstoken, refreshtoken, profile, done){
-    const userExist = await User.findOne({id: profile.id})
+    const userExist = await User.findOne({email: profile.email})
     console.log(userExist)
     if(userExist){ 
     console.log(profile)
@@ -26,6 +27,7 @@ async function(request, accesstoken, refreshtoken, profile, done){
     }else{
 
         const userEmail = await User.findOne({email: profile.email})
+       
         if(userEmail){
             return done(null, {type: "user already exist", logtype: "user already exist"})
         }

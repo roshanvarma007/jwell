@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import Home from './Home'
 import Slideshow from './Slideshow'
 import Whychooseus from './Whychooseus'
@@ -10,6 +10,7 @@ import axios from 'axios'
 import Slide from './Slide'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../store/auth'
+import api from './Api'
 
 const Client = () => {
 
@@ -20,17 +21,19 @@ const Client = () => {
   // })
 
   const navigate = useNavigate()
-  const {userData} = useAuth()
+  
+  const [user,setUser] = useState()
 
 
-  console.log("userdata", userData)
-  if(userData?.logtype=="register"){
-    navigate("/register-info")
-  }
 
-  if(userData?.logtype=="user already exist"){
-    window.location.href = 'http://localhost:3000/logout';
-  }
+  // console.log("userdata", userData)
+  // if(userData?.logtype=="register"){
+  //   navigate("/register-info")
+  // }
+
+  // if(userData?.logtype=="user already exist"){
+  //   window.location.href = 'http://localhost:3000/logout';
+  // }
 
  
   return (

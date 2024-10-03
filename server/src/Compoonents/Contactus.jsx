@@ -6,8 +6,6 @@ const Contactus = () => {
 
   const {user} = useAuth()
 
-  console.log(user?.userData?.name)
-
   const [data,setData] = useState({
      names: user?.userData?.name,
      email: user?.userData?.email,

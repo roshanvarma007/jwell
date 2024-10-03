@@ -6,7 +6,6 @@ import Logo from './Logo';
 import Profile from "./Profile"
 import { Button } from '@material-tailwind/react';
 import { useAuth } from '../../store/auth';
-import axios from 'axios';
 
 const Navbar = () => {
   const [lastScrollTop, setLastScrollTop] = useState(0);
@@ -37,7 +36,8 @@ const Navbar = () => {
   }, [lastScrollTop]);
 
 
-  const { userData } = useAuth()
+  const { user } = useAuth()
+
 
   return (
     <>
@@ -52,7 +52,7 @@ const Navbar = () => {
           {/* profile */}
           <div className='absolute right-7'>
             {
-              !userData ? (
+              !user ? (
                 <>
                   <Button size='sm' className='mr-3 max-sm:hidden ac-bg rounded-full' onClick={() => navigate("/login")}>Login</Button>
                   <Button size='sm' className='max-sm:hidden ac-bg rounded-full' onClick={() => navigate("/register")}>Register</Button>

@@ -9,16 +9,17 @@ import TulipBtn from './TulipBtn';
 
 
 const TextImg = () => {
-
+  const {updateCredits, user, credit} = useAuth()
   const navigate = useNavigate()
   const [isleft, setIsleft] = useState("0")
   const [ai, setAi] = useState("igtx")
   const [prompt, setPrompt] = useState({
     msg: "",
-    noImG: 1
+    noImG: 1,
+    email: user?.userData?.email
+
   })
   const [data, setData] = useState()
-  const {updateCredits, user, credit} = useAuth()
 
   //    generateImages();
   const [status, setStatus] = useState(true);  // Initialize status as true
@@ -57,35 +58,36 @@ const TextImg = () => {
         alert("Not enought credits to generate images 😟")
       } else {
         console.log(prompt.noImG)
-        updateCredits("saifkhan77806@gmail.com", prompt.noImG)
+        updateCredits(user?.userData?.email, prompt.noImG)
         setDisable(true)
         setMessage("Pending ...")
-        const response = await axios.post("http://localhost:3000/text", prompt);
+        const response = await api.post("/text", prompt);
         console.log(response.data);
         // Start a loop that continues while status is true
-        while (status) {
-          try {
-            // Make the second axios call inside the loop
-            setMessage("Generating ...")
+        // while (status) {
+        //   try {
+        //     // Make the second axios call inside the loop
+        //     setMessage("Generating ...")
 
-            const res = await axios.get("http://localhost:3000/re");
-            console.log(res.data.data.generations_by_pk.status);
-            // If status from the response is "COMPLETE", update the status and break the loop
-            if (res.data.data.generations_by_pk.status === "COMPLETE") {
-              setStatus(false);  // This will cause the loop to stop
-              console.log(res.data);
-              setData(res.data.data)
-              setDisable(false)
-              setMessage("Generated !!👍")
-              storeHistory(res?.data?.data?.generations_by_pk?.generated_images, res?.data?.data?.generations_by_pk?.prompt, user?.userData?.email)
-              setPrompt({msg: "", noImG: 0})
-              break;  // Exit the while loop
-            }
-          } catch (err) {
-            console.log("Error while generating images:", err);
-          }
-        }
+        //     const res = await api.get("/re");
+        //     console.log(res.data.data.generations_by_pk.status);
+        //     // If status from the response is "COMPLETE", update the status and break the loop
+        //     if (res.data.data.generations_by_pk.status === "COMPLETE") {
+        //       setStatus(false);  // This will cause the loop to stop
+        //       console.log(res.data);
+        //       setData(res.data.data)
+        //       setDisable(false)
+        //       setMessage("Generated !!👍")
+        //       storeHistory(res?.data?.data?.generations_by_pk?.generated_images, res?.data?.data?.generations_by_pk?.prompt, user?.userData?.email)
+        //       setPrompt({msg: "", noImG: 0})
+        //       break;  // Exit the while loop
+        //     }
+        //   } catch (err) {
+        //     console.log("Error while generating images:", err);
+        //   }
+        // }
         setStatus(true)
+        setDisable(false)
         setMessage("Generate")
       }
 

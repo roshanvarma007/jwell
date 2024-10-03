@@ -10,16 +10,19 @@ import Logo from "./Logo";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Target } from "lucide-react";
+import { useAuth } from "../../store/auth";
+import api from "./Api";
    
   function Login() {
+
+    const {userDatas, storeUser} = useAuth()
 
     const navigate = useNavigate()
     const [userEmail,setUserEmail] = useState()
     const [userPassword,setUserPassword] = useState()
 
     const submit = () => {
-      axios.post("http://localhost:3000/manual-login", {
+      api.post("/manual-login", {
           email: userEmail,
           password: userPassword
       }, {
@@ -32,12 +35,34 @@ import { Target } from "lucide-react";
 
         console.log(res);
         if(res.status==200){
-          window.location.href = 'http://localhost:5173/';  // Redirect to frontend URL
+          console.log(res.data?.token)
+          localStorage.removeItem("token")
+          storeUser(res.data?.token)
+          navigate("/")
+        //   window.location.href = 'https://server-ten-orcin.vercel.app/';  // Redirect to frontend URL
         }
     }).catch((err) => {
         console.error('Error during request:', err);
     });
     };
+
+
+   useEffect(()=>{
+    const token = localStorage.getItem('token')
+    if(!token || token == undefined){
+    fetch('https://back-alpha-amber.vercel.app/data')
+  .then(response => response.json())
+  .then(data => {
+    console.log(data)
+    storeUser(data?.token)
+  })
+  .catch(error => {
+      console.error('Login error:', error);
+  });
+
+}
+
+   },[])
     
     
     return (
@@ -55,9 +80,14 @@ import { Target } from "lucide-react";
             
 
           <div className="mb-1 flex flex-col gap-6">
-          <a href="http://localhost:3000/auth"><Button className="mt-6 bg-light rounded-full bg-gray-500" fullWidth>
+          {/* <a href="https://back-alpha-amber.vercel.app/auth"> */}
+          <Button className="mt-6 bg-light rounded-full bg-gray-500" onClick={()=>{
+            localStorage.removeItem('token')
+            window.location.href = "https://back-alpha-amber.vercel.app/auth"
+          }} fullWidth>
             Login with google
-          </Button></a>
+          </Button>
+          {/* </a> */}
           <span className="text-center -my-4 text-gray-500">or</span>
          <a href="http://localhost:3000/linkedin"><Button className="mt-2 bg-light rounded-full bg-gray-500" fullWidth>
             Login with Linkedin

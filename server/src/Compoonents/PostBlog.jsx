@@ -7,10 +7,10 @@ import { Input, Typography } from '@material-tailwind/react';
 
 const PostBlog = () => {
     
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
     const onDrop = useCallback(acceptedFiles => {
         // Do something with the files
       }, [])
-      const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
     
   return (
     <>

@@ -5,11 +5,11 @@ import { useNavigate } from 'react-router-dom'
 
 const Home = () => {
 
-  const {userData} = useAuth()
+  const {user} = useAuth()
   const navigate = useNavigate()
 
   const validateUser = () =>{
-    if(userData)
+    if(user)
       navigate("ai/img-text")
     else
       navigate("/login")

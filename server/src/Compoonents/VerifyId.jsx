@@ -2,6 +2,7 @@ import { Button } from '@material-tailwind/react'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import api from './Api'
 
 const VerifyId = () => {
 
@@ -11,7 +12,7 @@ const VerifyId = () => {
     console.log("our params", params.email)
 
     useEffect(()=>{
-        axios.post(`http://localhost:3000/send-otp`, {email: params?.email}).then((res)=>{
+        api.post(`/send-otp`, {email: params?.email}).then((res)=>{
             console.log(res.data)
         }).catch((err)=>{
             console.log(err)
@@ -20,16 +21,19 @@ const VerifyId = () => {
 
     const verifyotp = (e) =>{
         e.preventDefault()
-        axios.post(`http://localhost:3000/verfiy-otp`, {userOtp}).then((res)=>{
+        api.post(`/verfiy-otp`, {userOtp}).then((res)=>{
             console.log(res.data)
             if(res.data?.success){
-            axios.post(`http://localhost:3000/verified/${params?.email}`).then((res)=>{
+            api.post(`/verified/${params?.email}`).then((res)=>{
                 console.log("verification", res.data)
             }).catch((err)=>{
                 console.log("verification", err)
             })
                 navigate("/login")
+            }else{
+                alert("invalid otp")
             }
+
         }).catch((err)=>{
             console.log(err)
         })

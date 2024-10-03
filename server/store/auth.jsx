@@ -12,36 +12,63 @@ export const Authprovider = ({children}) =>{
 
      
      const [user,setUser] = useState()
-     const [userId, setUserId] = useState();
-     const [userEmail, setUserEmail] = useState("")
+     const [tokenss, setTokenss] = useState();
      const [credit,setCredit] = useState()
    
 
      // const navigate = useNavigate()
      const [userData,setUserData] = useState()
   useLayoutEffect(()=>{
-    axios.get("http://localhost:3000/linkedin/success",{ withCredentials: true}).then((res)=>{
-      setUserData(res.data)
-      console.log("from user",res.data)
+    const token = localStorage.getItem("token")
 
-      if(res.data.logtype=="user already exist"){
-          console.log("user exist")
-          // window.open("http://localhost:3000/logout")
-      }
-
-     //  access from user database
-      axios.get(`http://localhost:3000/userid/${res.data.type?.email}`).then((res)=>{
-       console.log(res.data)
-       setUser(res.data)
-       setCredit(res.data.userData.credits)
-
-      }).catch((err)=>{
-       console.log("user id err", err)
-      })
+    if(token!=undefined || token){
+     api.post("/verify-token", {token}).then((res)=>{
+          console.log("user found", res.data)
+          setUserData()
+          api.get(`/userid/${res.data?.user?.id?.type?.email}`).then((res)=>{
+               console.log("user founded of innner api",res.data)
+               setUser(res.data)
+               setCredit(res.data.userData.credits)
+              }).catch((err)=>{
+               console.log("user id err", err)
+              })  
+     }).catch((err)=>{
+          console.log(err)
      })
+    }else{
+     console.log("user not found")
+    }
+  },[credit, tokenss])
 
-  },[credit])
+     const userDatas = (email) =>{
+               api.get(`/userid/${email}`).then((res)=>{
+                console.log("user",res.data)
+                setUser(res.data)
+                setCredit(res.data.userData.credits)
+         
+               }).catch((err)=>{
+                console.log("user id err", err)
+               })    
+     }
+
+
+     const  storeUser = (token) =>{
+          console.log("this is from auth.jsx",token)
+          const tokens = localStorage.getItem('token')
+          if(!tokens || tokens == undefined){
+               localStorage.setItem("token", token)
+               setTokenss(token)
+          }else{
+               console.log("token already exist")
+          }
+     }
+
+     const logout = () =>{
+          localStorage.removeItem("token")
+          setTokenss(null)
+     }
   
+     
   console.log("credits", credit)
 
 
@@ -61,7 +88,7 @@ export const Authprovider = ({children}) =>{
  
 
   
-     return <AuthContext.Provider value={{ userData, user, updateCredits, credit}}>
+     return <AuthContext.Provider value={{ userData, user, updateCredits, credit, userDatas, storeUser, logout}}>
             {children}
             </AuthContext.Provider>
 

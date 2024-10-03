@@ -5,6 +5,7 @@ const multer = require("multer")
 const cookieSession = require('cookie-session')
 const app = express()
 const cors = require('cors')
+const jwt = require('jsonwebtoken')
 const User = require('./schema/UserSchema')
 const cookieParser = require('cookie-parser')
 const axios = require('axios')
@@ -19,8 +20,10 @@ require("./db")
 const Razorpay = require('razorpay'); 
 const { v4: uuidv4 } = require('uuid');
 const { sendToken } = require('./sendToken')
+const {sendSubscription} = require("./sendSubscription")
 const Blog = require('./schema/BlogSchema')
 const Contact = require('./schema/ContactSchema')
+const { errorMonitor } = require('stream')
 
 // This razorpayInstance will be used to
 // access any resource from razorpay
@@ -78,27 +81,26 @@ passport.use(new LocalStrategy({
     }
 }));
 
-passport.serializeUser((user, done) => {
-    done(null, user.id);
-});
+passport.serializeUser((user,done)=>{
+    done(null, user)
+})
 
-passport.deserializeUser((id, done) => {
-    User.findById(id, (err, user) => {
-        done(err, user);
-    });
-});
+passport.deserializeUser(function(user,done){
+    done(null,user)
+})
 
 
 app.use(cors({
-    origin: 'http://localhost:5173',  // Frontend URL
+    origin: 'https://server-ten-orcin.vercel.app',  // Frontend URL
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // Allowed HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
-    credentials: true // Allow credentials (cookies, auth headers, etc.)
+    credentials: true, // Allow credentials (cookies, auth headers, etc.)
+    sameSite: 'secure'
 }));
 
 
 app.options('*', (req, res) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.header('Access-Control-Allow-Origin', 'https://server-ten-orcin.vercel.app');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.header('Access-Control-Allow-Credentials', 'true');
@@ -160,21 +162,29 @@ app.get('/linkedin', passport.authenticate('linkedin'));
 
 
 app.get('/auth/callback', passport.authenticate("google", {
-    successRedirect: "http://localhost:5173/",
-    failureRedirect: "/auth/callback/failure"
-}))
-
+    successRedirect: "/linkedin/success",
+    failureRedirect: "/linkedin/failure"
+})
+);
 app.get('/linkedin/callback', passport.authenticate('linkedin', {
-    successRedirect: "http://localhost:5173/",
+    successRedirect: "https://server-ten-orcin.vercel.app/",
     failureRedirect: "/linkedin/failure"
 }))
 
+let token
+
 app.get('/linkedin/success', (req, res) => {
-    if (!req.user) {
-        res.redirect("/linkedin/failure")
-    }
+    // if (!req.user) {
+    //     res.redirect("/linkedin/failure")
+    // // }
+     token = jwt.sign({ id: req.user, data: "data" }, 'your-secret-key', {
+        expiresIn: '1d' // Token expiry (e.g., 1 day)
+    });
     // console.log(req)
-    res.status(200).send(req.user)
+
+    res.redirect(`https://server-ten-orcin.vercel.app/`)
+    // res.redirect(`/data`)
+    // res.status(200).send({token})
 
 })
 
@@ -183,12 +193,22 @@ app.get('/linkedin/failure', (req, res) => {
 })
 
 
+app.post("/verify-token",async(req,res)=>{
+    const {token} = req.body
+    const user = await jwt.verify(token, 'your-secret-key')
+    
+    res.status(200).send({user})
+})
 
 // success
 
 app.get("/data", (req, res) => {
     // console.log("check",req.user)
-    res.status(200).send(req.user)
+    // const {token} = req.params
+    const tkens = token
+    res.status(200).send({token: tkens })
+    token = null
+    // res.redirect("https://server-ten-orcin.vercel.app/")
 })
 
 app.get("/userid/:email", async (req, res) => {
@@ -216,18 +236,23 @@ app.post("/update-user/:id", async (req, res) => {
 })
 
 app.post("/send-otp", async(req,res)=>{
-    const {email} = req.body;
 
-    const user = await User.findOne({email});
-
-    if(!user){
-        res.status(200).send({msg:"invalid Email"});
-    }else{
-        otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
-        console.log(`otp from mail side :- ${otp}`);
-        sendmail(otp, email);
-        res.status(200).send({msg: user._id})
+    try{
+        const {email} = req.body;
+        const user = await User.findOne({email});
+    
+        if(!user){
+            res.status(200).send({msg:"invalid Email"});
+        }else{
+            otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
+            console.log(`otp from mail side :- ${otp}`);
+             sendmail(otp, email);
+            res.status(200).send({msg: user._id, otp})
+        }
+    }catch(err){
+        res.status(404).send(err)
     }
+   
 })
 
 app.post("/verfiy-otp", async(req,res)=>{
@@ -255,7 +280,7 @@ app.post('/setinfo/:id', async (req, res) => {
     const { firstName, lastName, password, phone, country } = req.body
 
     res.setHeader("Access-Control-Allow-Credentials", "*")
-    res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+    res.setHeader("Access-Control-Allow-Origin", "https://server-ten-orcin.vercel.app");
 
     const hashedPss = await bcrypt.hash(password, 10)
 
@@ -273,7 +298,7 @@ app.get('/logout', (req, res, next) => {
         if (err) {
             return next(err)
         }
-        res.redirect('http://localhost:5173/login')
+        res.redirect('https://server-ten-orcin.vercel.app/login')
     });
 })
 
@@ -318,8 +343,11 @@ app.post('/manual-login', (req, res, next) => {
                     console.log('Error during login:', err);  // Log login error
                     return next(err);
                 }
+                token = jwt.sign({ id: req.user, data: "data" }, 'your-secret-key', {
+                    expiresIn: '1d' // Token expiry (e.g., 1 day)
+                });
                 console.log('Authentication successful');  // Log success
-               return res.status(200).send({msg: "logged"})
+               return res.status(200).send({msg: "logged", user: req.user, token})
             });
         })(req, res, next);
     }catch(err){
@@ -347,23 +375,32 @@ app.get("/cookie",(req,res)=>{
 })
 
 app.post("/text",async (req,res)=>{
-    const {msg, noImG} = req.body
+    const {msg, noImG, email} = req.body
    
 leonardoai.auth('80849ed3-cfad-4f6e-b241-8b15cf35178a');
 leonardoai.createGeneration({
-  alchemy: true,
-  height: 768,
-  modelId: 'b24e16ff-06e3-43eb-8d33-4416c2d75876',
+//   alchemy: true,
+//   height: 768,
+//   modelId: '6b645e3a-d64f-4341-a6d8-7a3690fbf042',
   num_images: Number(noImG),
-  presetStyle: 'DYNAMIC',
+//   presetStyle: 'DYNAMIC',
   prompt: msg,
-  width: 1024
+//   width: 1024
+modelId: "6b645e3a-d64f-4341-a6d8-7a3690fbf042",
+  contrast: 3.5,
+//   prompt: "an orange cat standing on a blue basketball with the text PAWS",
+//   num_images: 4,
+  width: 1472,
+  height: 832,
+  ultra: true,
+  styleUUID: "111dc692-d470-4eec-b791-3475abac4c46",
+  enhancePrompt: true
 })
   .then(async({ data }) => {
 
     console.log(data.sdGenerationJob.generationId)
 
-    await User.findOneAndUpdate({email: "khansaif86783@gmail.com"}, {id: data.sdGenerationJob.generationId}).then(()=>{
+    await User.findOneAndUpdate({email}, {id: data.sdGenerationJob.generationId}).then(()=>{
         console.log("id stored successfully")
         res.status(200).send({data: "id stored successfully"})
     }).catch((err)=>{
@@ -373,7 +410,11 @@ leonardoai.createGeneration({
    
 
 )
-  .catch(err => console.error(err));
+  .catch(err => 
+  {
+    res.status(200).send(err)
+  }
+  );
 })
 
 
@@ -680,13 +721,17 @@ app.post('/verify-payment', async (req, res) => {
 
 app.post("/subscription", async(req,res)=>{
     const {subscription, credits, email} = req.body;
-
+    sendSubscription(email,subscription)
     await User.findOneAndUpdate({email}, {subscription, credits}).then(()=>{
+
         res.status(200).send({msg : "subscriptions and credit stored successfully"})
+        
     }).catch((err)=>{
         console.log(err)
         res.status(404).send(err)
     })
+
+
 
 })
 

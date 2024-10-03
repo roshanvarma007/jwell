@@ -20,7 +20,7 @@ const Post = () => {
       console.log(para)
       if(src){
         const imgTag = document.createElement('img');
-        imgTag.src = `http://localhost:3000/public/${src}`
+        imgTag.src = `https://back-alpha-amber.vercel.app/public/${src}`
         imgTag.className = "w-[70%] h-[300px] mx-auto rounded-xl shadow-xl my-5"
         para.appendChild(imgTag)
       }
@@ -31,7 +31,9 @@ const Post = () => {
 
       const content = para.innerHTML
 
-      await api.post("/post-blog", {title: texts,thought: content,thumbnail: "http://localhost:3000/public/image_1727639242934.jpg"})
+      await api.post("/post-blog", {title: texts,thought: content,thumbnail: "https://back-alpha-amber.vercel.app/public/image_1727639242934.jpg"}).then((res)=>{
+        alert("blog posted successfully !")
+      })
     }
 
     const onDrop = useCallback(acceptedFiles => {

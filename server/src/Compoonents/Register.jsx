@@ -10,6 +10,7 @@ import { useCountries } from "use-react-countries"
 import Logo from "./Logo";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import api from "./Api";
 
 function Register() {
 
@@ -29,11 +30,8 @@ function Register() {
   const submit = (e) =>{
     e.preventDefault()
     console.log(userData)
-    axios.post("http://localhost:3000/register", userData).then((res)=>{
+    api.post("/register", userData).then((res)=>{
       console.log(res.data)
-
-    
-
     if(res.status==200){
       navigate(`/verify-id/${userData?.email}`)
     }

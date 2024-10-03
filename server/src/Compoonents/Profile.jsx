@@ -18,7 +18,9 @@ import url from "../assets/proImg"
     }
   });
 
-  const {userData, user} = useAuth()
+
+
+  const { user, logout } = useAuth()
 
 
   
@@ -57,13 +59,13 @@ import url from "../assets/proImg"
         </p>
       
       <div className='flex'>
-         <button className='mx-3 ac-bg px-5 py-2 rounded-full font-semibold hover:bg-[#284e1f] transition-all text-white'>History</button>
+         <button className='mx-3 ac-bg px-5 py-2 rounded-full font-semibold hover:bg-[#284e1f] transition-all text-white' onClick={()=>{navigate("/history")}}>History</button>
         <button className='mx-3 ac-bg px-10 py-1 rounded-full font-semibold hover:bg-[#284e1f] transition-all text-white' onClick={()=>{
           navigate("/profile-info")
         }}>See more</button>
-        <a href="http://localhost:3000/logout">
-        <button className='mx-3 ac-bg px-5 py-4 font-semibold hover:bg-[#284e1f] rounded-full transition-all text-white'>Logout</button>
-        </a>
+        <button className='mx-3 ac-bg px-5 py-4 font-semibold hover:bg-[#284e1f] rounded-full transition-all text-white' onClick={()=>{
+          logout()
+        }}>Logout</button>
       </div>
       </div>
     </div>

@@ -25,7 +25,7 @@ function Pricing() {
     try {
       // Make the API call to backend
       const order = await api.post("/payment", {
-        amount: 5000,
+        amount: 100,
         currency: "INR",
         receipt: "saifkhan",
         note: {
@@ -50,7 +50,7 @@ function Pricing() {
         handler: async (response) => {
           console.log("1",response)
           try {
-            await fetch("http://localhost:3000/verify-payment", {
+            await fetch("https://back-alpha-amber.vercel.app/verify-payment", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
