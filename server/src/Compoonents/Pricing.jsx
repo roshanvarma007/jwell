@@ -10,7 +10,7 @@ function Pricing({amt, uses}) {
   const navigate = useNavigate()
   const {user} = useAuth()
 
-  const RAZORPAY_KEY_ID = "rzp_live_9YDNdvLxBLmTAZ";
+  const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
   const data = {
     amount: amt,
