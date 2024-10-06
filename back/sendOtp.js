@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 let otps;
+require('dotenv').config()
 
 const sendmail = (otp, email) =>{
     const transporter = nodemailer.createTransport({
@@ -7,7 +8,7 @@ const sendmail = (otp, email) =>{
         port: 587,
         auth: {
           user: 'khansaif86783@gmail.com',
-          pass: 'kdkreedyvjjezvjs',
+          pass: process.env.EMAIL_PASS_KEY,
         },
       });
       

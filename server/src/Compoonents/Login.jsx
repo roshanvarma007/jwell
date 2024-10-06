@@ -40,6 +40,8 @@ import api from "./Api";
           storeUser(res.data?.token)
           navigate("/")
         //   window.location.href = 'https://server-ten-orcin.vercel.app/';  // Redirect to frontend URL
+        }else{
+          alert("Login failed 😟")
         }
     }).catch((err) => {
         console.error('Error during request:', err);
@@ -80,18 +82,20 @@ import api from "./Api";
             
 
           <div className="mb-1 flex flex-col gap-6">
-          {/* <a href="https://back-alpha-amber.vercel.app/auth"> */}
+       
           <Button className="mt-6 bg-light rounded-full bg-gray-500" onClick={()=>{
             localStorage.removeItem('token')
-            window.location.href = "https://back-alpha-amber.vercel.app/auth"
+            window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth`
           }} fullWidth>
             Login with google
           </Button>
-          {/* </a> */}
           <span className="text-center -my-4 text-gray-500">or</span>
-         <a href="http://localhost:3000/linkedin"><Button className="mt-2 bg-light rounded-full bg-gray-500" fullWidth>
+          <Button className="mt-6 bg-light rounded-full bg-gray-500" onClick={()=>{
+            localStorage.removeItem('token')
+            window.location.href = `${import.meta.env.VITE_BACKEND_URL}/linkedin`
+          }} fullWidth>
             Login with Linkedin
-          </Button></a>
+          </Button>
           <span className="text-center -my-4 text-gray-500">or</span>
             
             <Typography variant="h6" color="blue-gray" className="-mb-3">

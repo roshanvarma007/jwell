@@ -54,20 +54,22 @@ import url from "../assets/proImg"
         <h2 className="text-xl font-semibold mb-1">{user?.userData?.firstName}</h2>
         <p className="mb-4">
            <span className='font-semibold'>Subcription: </span>
-           monthly Bussiness
+          { user?.userData?.subscription ? user?.userData?.subscription: "No subcription purchased"}
            <br />
            <span className='font-semibold'>Credits: </span>
-            <span className='ml-9'>0</span>
+            <span className='ml-9'>{user?.userData?.credits}</span>
         </p>
       
       <div className='flex'>
-         <button className='mx-3 ac-bg px-5 py-2 rounded-full font-semibold hover:bg-[#284e1f] transition-all text-white' onClick={()=>{navigate("/history")}}>History</button>
+        {
+          user?.userData?.subscription &&  <button className='mx-3 ac-bg px-5 py-2 rounded-full font-semibold hover:bg-[#284e1f] transition-all text-white' onClick={()=>{navigate("/history")}}>History</button>
+        }
         <button className='mx-3 ac-bg px-10 py-1 rounded-full font-semibold hover:bg-[#284e1f] transition-all text-white' onClick={()=>{
           navigate("/profile-info")
         }}>See more</button>
         <button className='mx-3 ac-bg px-5 py-4 font-semibold hover:bg-[#284e1f] rounded-full transition-all text-white' onClick={()=>{
         logout()
-        // window.location.href = "https://server-ten-orcin.vercel.app"
+        window.location.href = "https://server-ten-orcin.vercel.app/"
         }}>Logout</button>
       </div>
       </div>

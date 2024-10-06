@@ -28,17 +28,24 @@ function Register() {
   })
 
   const submit = (e) =>{
-    e.preventDefault()
-    console.log(userData)
-    api.post("/register", userData).then((res)=>{
-      console.log(res.data)
-    if(res.status==200){
-      navigate(`/verify-id/${userData?.email}`)
+    if(userData.email==""||userData.country||userData.profile==""||userData.firstName==""||userData.lastName==""||userData.password==""|| userData.phone==""){
+      alert("Please fill all the fields")
+    }else{      
+      e.preventDefault()
+      console.log(userData)
+      api.post("/register", userData).then((res)=>{
+        console.log(res.data)
+        if(res.status==404){
+          alert("user already exist")
+        }
+      if(res.status==200){
+        navigate(`/verify-id/${userData?.email}`)
+      }
+  
+    }).catch((err)=>{
+      console.log("from err", err)
+    })
     }
-
-  }).catch((err)=>{
-    console.log("from err", err)
-  })
 
   }
 
@@ -64,13 +71,19 @@ function Register() {
           </Typography>
 
           <div className="mb-1 flex flex-col gap-6">
-          <a href="http://localhost:3000/auth"><Button className="mt-6 bg-light rounded-full bg-gray-500" fullWidth>
+          <Button className="mt-6 bg-light rounded-full bg-gray-500" onClick={()=>{
+            localStorage.removeItem('token')
+            window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth`
+          }} fullWidth>
             Login with google
-          </Button></a>
+          </Button>
           <span className="text-center -my-4 text-gray-500">or</span>
-         <a href="http://localhost:3000/linkedin"><Button className="mt-2 bg-light rounded-full bg-gray-500" fullWidth>
+          <Button className="mt-6 bg-light rounded-full bg-gray-500" onClick={()=>{
+            localStorage.removeItem('token')
+            window.location.href = `${import.meta.env.VITE_BACKEND_URL}/linkedin`
+          }} fullWidth>
             Login with Linkedin
-          </Button></a>
+          </Button>
 
             <div className="my-4 flex items-center gap-4">
               <div>

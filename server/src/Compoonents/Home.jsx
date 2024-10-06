@@ -9,11 +9,15 @@ const Home = () => {
   const navigate = useNavigate()
 
   const validateUser = () =>{
-    if(user)
-      navigate("ai/img-text")
-    else
+    if(user){
+      if(user?.userData?.subscription || user?.userData?.credits>0){
+        navigate("/ai/img-text")
+      }else{
+        navigate("/pricing")
+      }
+    }else{
       navigate("/login")
-    
+    }
   }
  
 

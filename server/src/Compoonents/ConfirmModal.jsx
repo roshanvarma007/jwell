@@ -39,7 +39,7 @@ const ConfirmModal = ({ user }) => {
             <p className="mb-4 luxuria">Are you want to give review about our jeweallity</p>
 
             {/* Show the checkbox only if user?.userData?.credits === 10065 */}
-            {user === 10065 && (
+            {user <= 10 && (
               <div className="flex items-center mb-4 poppins">
                 <input
                   type="checkbox"

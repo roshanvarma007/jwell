@@ -1,16 +1,19 @@
 const nodemailer = require('nodemailer');
 let otps;
+require('dotenv').config()
+
 
 const sendToken = (email, token) =>{
-    const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        auth: {
-          user: 'khansaif86783@gmail.com',
-          pass: 'kdkreedyvjjezvjs',
-        },
-      });
-      
+    
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    auth: {
+      user: 'khansaif86783@gmail.com',
+      pass: process.env.EMAIL_PASS_KEY,
+    },
+  });
+  
         transporter.verify().then(console.log).catch(console.error);
       
         transporter.sendMail({

@@ -3,6 +3,7 @@ const GoogleStrategy = require('passport-google-oauth2').Strategy
 const LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
 const jwt = require('jsonwebtoken');
 const User = require('./schema/UserSchema')
+require('dotenv').config()
 
 passport.serializeUser((user,done)=>{
     done(null, user)
@@ -13,9 +14,9 @@ passport.deserializeUser(function(user,done){
 })
 
 passport.use(new GoogleStrategy({
-    clientID: "487161400249-k9nkdcsg8ul6cpuj05b7n5smobfj7ee9.apps.googleusercontent.com",
-    clientSecret: "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",
-    callbackURL: "https://back-alpha-amber.vercel.app/auth/callback",
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_SECRET_KEY,
+    callbackURL: `${process.env.BACKEND_URL}/auth/callback`,
     // passReqToCallback: true 
 },
 async function(request, accesstoken, refreshtoken, profile, done){
@@ -51,9 +52,9 @@ async function(request, accesstoken, refreshtoken, profile, done){
 ))
 
 passport.use(new LinkedInStrategy({
-    clientID: "77z4ld77ttpzdk",
-    clientSecret: "N3qNvscT73VYJ7we",
-    callbackURL: 'http://localhost:3000/linkedin/callback',
+    clientID: process.env.LINKEDIN_CLIENT_ID,
+    clientSecret: process.env.LINKEDIN_CLIENT_SECRET_KEY,
+    callbackURL: `${process.env.BACKEND_URL}/linkedin/callback`,
     scope: ['openid', 'profile', 'w_member_social', 'email'],
     profileUrl: 'https://api.linkedin.com/v2/me'
   },

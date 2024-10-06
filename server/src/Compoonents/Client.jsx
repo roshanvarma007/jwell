@@ -38,6 +38,7 @@ const Client = () => {
   //   window.location.href = 'http://localhost:3000/logout';
   // }
 
+  // console.log("env",process.env.BACKEND_URL)
  
   return (
     <>

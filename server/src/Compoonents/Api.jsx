@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const api = axios.create({
-    baseURL: "https://back-alpha-amber.vercel.app"
+    baseURL: import.meta.env.VITE_BACKEND_URL
   });
 
 export default api

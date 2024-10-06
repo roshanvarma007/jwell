@@ -27,6 +27,7 @@ const Blog = require('./schema/BlogSchema')
 const Contact = require('./schema/ContactSchema')
 const { errorMonitor } = require('stream')
 const { uploadMultiple } = require('./middlware/imageUploader')
+require('dotenv').config()
 
 // This razorpayInstance will be used to
 // access any resource from razorpay
@@ -50,9 +51,9 @@ const multer = require('multer');
 
 // Cloudinary config
 cloudinary.config({
-    cloud_name: "disb0qkhr",
-    api_key: "965223264892684",
-    api_secret: "U_vXLOAlOxBFiJNLdW5WepoYjjs",
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDIANRY_SECRET_KEY,
   });
 
 // Cloudinary storage setup for multer
@@ -73,15 +74,15 @@ const upload = multer({ storage: storage });
 
 const razorpayInstance = new Razorpay({
     // Replace with your key_id
-    key_id: "rzp_live_9YDNdvLxBLmTAZ",
+    key_id: process.env.RAZORPAY_KEY_ID,
     // Replace with your key_secret
-    key_secret: "PCfeCF3NKFQCIRwWIRBzwtQX"
+    key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
 let otp
 let imageId
 const RAZORPAY_KEY_ID = "rzp_live_9YDNdvLxBLmTA"
-const RAZORPAY_KEY_SECRET = "PCfeCF3NKFQCIRwWIRBzwtQX"
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET
 
 
 // cloudinary.config({
@@ -95,7 +96,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}))
 
 
-// initialiePassport(passport);
 passport.use(new LocalStrategy({
     usernameField: 'email',  // Using 'email' instead of 'username'
     passwordField: 'password'
@@ -132,7 +132,7 @@ passport.deserializeUser(function(user,done){
 
 
 app.use(cors({
-    origin: 'https://server-ten-orcin.vercel.app',  // Frontend URL
+    origin: `${process.env.FORNTEND_URL}`,  // Frontend URL
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // Allowed HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     credentials: true, // Allow credentials (cookies, auth headers, etc.)
@@ -141,7 +141,7 @@ app.use(cors({
 
 
 app.options('*', (req, res) => {
-    res.header('Access-Control-Allow-Origin', 'https://server-ten-orcin.vercel.app');
+    res.header('Access-Control-Allow-Origin', `${process.env.FORNTEND_URL}`);
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.header('Access-Control-Allow-Credentials', 'true');
@@ -217,7 +217,7 @@ app.get('/auth/callback', passport.authenticate("google", {
 })
 );
 app.get('/linkedin/callback', passport.authenticate('linkedin', {
-    successRedirect: "https://server-ten-orcin.vercel.app/",
+    successRedirect: `/linkedin/success`,
     failureRedirect: "/linkedin/failure"
 }))
 
@@ -232,7 +232,7 @@ app.get('/linkedin/success', (req, res) => {
     });
     // console.log(req)
 
-    res.redirect(`https://server-ten-orcin.vercel.app/`)
+    res.redirect(`${process.env.FORNTEND_URL}/`)
     // res.redirect(`/data`)
     // res.status(200).send({token})
 
@@ -347,7 +347,7 @@ app.post('/setinfo/:id', async (req, res) => {
     const { firstName, lastName, password, phone, country } = req.body
 
     res.setHeader("Access-Control-Allow-Credentials", "*")
-    res.setHeader("Access-Control-Allow-Origin", "https://server-ten-orcin.vercel.app");
+    res.setHeader("Access-Control-Allow-Origin", `${process.env.FORNTEND_URL}`);
 
     const hashedPss = await bcrypt.hash(password, 10)
 
@@ -365,7 +365,7 @@ app.get('/logout', (req, res, next) => {
         if (err) {
             return next(err)
         }
-        res.redirect('https://server-ten-orcin.vercel.app/login')
+        res.redirect(`${process.env.FORNTEND_URL}/login`)
     });
 })
 
@@ -444,7 +444,7 @@ app.get("/cookie",(req,res)=>{
 app.post("/text",async (req,res)=>{
     const {msg, noImG, email} = req.body
    
-leonardoai.auth('80849ed3-cfad-4f6e-b241-8b15cf35178a');
+leonardoai.auth(process.env.LEAONARDO_API_KEY);
 leonardoai.createGeneration({
 //   alchemy: true,
 //   height: 768,
@@ -492,7 +492,7 @@ app.get("/re",async(req,res)=>{
     console.log("from id",id.id)
     const ids = id.id
 
-leonardoai.auth('80849ed3-cfad-4f6e-b241-8b15cf35178a');
+leonardoai.auth(process.env.LEAONARDO_API_KEY);
 let statu = "PENDING"
 // while(statu === "PENDING"){
     console.log(statu, "epep")
@@ -517,7 +517,7 @@ let statu = "PENDING"
 
 })
 
-const api_Key = "80849ed3-cfad-4f6e-b241-8b15cf35178a";
+const api_Key = process.env.LEAONARDO_API_KEY;
 const authorization = `Bearer ${api_Key}`;            
 const headers = {
     "accept": "application/json",
@@ -587,7 +587,7 @@ app.post("/imgs", async(req,res)=>{
             //     headers: headers,
             //     body: JSON.stringify(payloadGenerate)
             // });
-            leonardoai.auth('80849ed3-cfad-4f6e-b241-8b15cf35178a');
+            leonardoai.auth(process.env.LEAONARDO_API_KEY);
             leonardoai.createGeneration({
                 "height": 512,
                 "modelId": "6bef9f1b-29cb-40c7-b9df-32b51c1f67d3", // Setting model ID to Leonardo Creative
@@ -623,7 +623,7 @@ app.post("/imgs", async(req,res)=>{
 
 let image_id
 app.post("/im", async(req,res)=>{
-    const authorization = `Bearer 80849ed3-cfad-4f6e-b241-8b15cf35178a`;
+    const authorization = `Bearer process.env.LEAONARDO_API_KEY`;
     
     const headers = {
         "accept": "application/json",
@@ -695,7 +695,7 @@ app.post("/im", async(req,res)=>{
 app.post("/enhance",async(req,res)=>{
     const {prompt} = req.body
 
-    leonardoai.auth('80849ed3-cfad-4f6e-b241-8b15cf35178a');
+    leonardoai.auth(process.env.LEAONARDO_API_KEY);
     leonardoai.promptImprove({prompt})
     .then(({ data }) => {
         console.log(data)
@@ -910,6 +910,6 @@ app.get('/auth/callback/failure', (req, res) => {
 })
 
 
-app.listen(3000, () => {
+app.listen(process.env.PORT, () => {
     console.log("server is running")
 })

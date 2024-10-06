@@ -13,13 +13,17 @@ const Contactus = () => {
      message: "",
   })
 
-  const submit = (async) =>{
-    api.post("/contacus",{names: user?.userData?.name, email: user?.userData?.email, subject: data.subject, message: data.message}).then((res)=>{
-      console.log("contact form addedd successfully !")
-      alert("contact form addedd successfully !")
-    }).catch((err)=>{
-      console.log(err)
-    })
+  const submit = () =>{
+    if(data.names=="" || data.email=="" || data.subject=="" || data.message==""){
+      alert("please fill all the fields")
+    }else{
+      api.post("/contacus",{names: user?.userData?.name, email: user?.userData?.email, subject: data.subject, message: data.message}).then((res)=>{
+        console.log("contact form addedd successfully !")
+        alert("contact form addedd successfully !")
+      }).catch((err)=>{
+        console.log(err)
+      })
+    }
     console.log(data)
   }
 

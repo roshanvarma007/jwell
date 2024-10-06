@@ -45,22 +45,26 @@ function RegisterInfo() {
 
     const submit = (e) => {
         e.preventDefault()
-        console.log(userDatas)
-
-        api.post(`/setinfo/${userData?.type.id}`, userDatas).then((res)=>{
-            console.log(res.data)
-        }).catch((err)=>{
-            console.log(err)
-        })
-
-        api.post(`/send-otp`, {email: userData?.type?.email}).then((res)=>{
-            console.log(res.data)
-        }).catch((err)=>{
-            console.log(err)
-        })
-        
-
-        navigate(`/verify-id/${userData?.type?.email}` )
+        if(userDatas.country=="",userDatas.firstName=="",userDatas.lastName=="" || userDatas.password=="" || userDatas.phone== ""){
+            alert("please fill all the fields")
+        }else{
+            console.log(userDatas)
+    
+            api.post(`/setinfo/${userData?.type.id}`, userDatas).then((res)=>{
+                console.log(res.data)
+            }).catch((err)=>{
+                console.log(err)
+            })
+    
+            api.post(`/send-otp`, {email: userData?.type?.email}).then((res)=>{
+                console.log(res.data)
+            }).catch((err)=>{
+                console.log(err)
+            })
+            
+    
+            navigate(`/verify-id/${userData?.type?.email}` )
+        }
 
     }
 

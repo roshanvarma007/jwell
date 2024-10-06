@@ -28,18 +28,18 @@ const Subcription = () => {
           lefty == "0" ? (
             <>
             <div className="section grid grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1 m-auto justify-around items-center">
-            <Pricing data={"200"}  />
-              <Pricing data={"600"} />
-              <Pricing data={"1200"} />
+            <Pricing amt={100} uses={"basic version"}  />
+              <Pricing amt={200} uses={"Advance version"} />
+              <Pricing amt={300} uses={"Bussiness version"} />
         </div>
 
 </>
           ):(
             <>     
               <div className="section grid grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1 m-auto justify-around ">
-            <Pricing data={"200"}  />
-              <Pricing data={"600"} />
-              <Pricing data={"1200"} />
+            <Pricing amt={"200"}  />
+              <Pricing amt={"600"} />
+              <Pricing amt={"1200"} />
               </div>
             </>
           )

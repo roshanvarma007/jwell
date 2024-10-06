@@ -28,7 +28,8 @@ const Menu = () => {
 
 
         {/* Features */}
-        <NavigationMenuItem className='shadow-none'>
+        {
+          user?.userData?.subscription || user?.userData?.credits>0 &&  <NavigationMenuItem className='shadow-none'>
           <NavigationMenuTrigger className="bg-transparent hov shadow-none luxuria pl-5 hover:bg-transparent hover:font-bold transition-all">Features</NavigationMenuTrigger>
           <NavigationMenuContent className="w-[50%]">
           <div className='luxuria w-[250px] h-[50px] flex items-center pl-3 hover:bg-gray-200 hover:font-bold transition-all'>
@@ -48,6 +49,7 @@ const Menu = () => {
           </div>
       </NavigationMenuContent>
         </NavigationMenuItem> 
+        }
 
         {/* How its works */}
         {

@@ -20,7 +20,7 @@ const Sheets = () => {
     const [open,setOpen] = useState(true)
     const navigate = useNavigate()
 
-    const {userData} = useAuth()
+    const {userData, logout} = useAuth()
 
     return (
         <>
@@ -81,9 +81,10 @@ const Sheets = () => {
                         userData ? (
                             <>
                             <Button className="absolute bottom-4 hover:bg-[#284e1f] transition-all ac-bg" onClick={()=>{navigate("/profile-info")}}>Profile</Button>
-                            <a href="http://localhost:3000/logout">
-                            <Button className="absolute bottom-4 right-4 hover:bg-[#284e1f] transition-all ac-bg">Logout</Button>
-                            </a>
+                            <button className='mx-3 ac-bg px-5 py-4 font-semibold hover:bg-[#284e1f] rounded-full transition-all text-white' onClick={()=>{
+                                logout()
+                                window.location.href = "https://server-ten-orcin.vercel.app/"
+                                }}>Logout</button>
                             </>
                         ): (
                             <>

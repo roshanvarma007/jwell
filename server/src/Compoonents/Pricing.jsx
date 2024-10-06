@@ -3,15 +3,17 @@ import { Card } from "flowbite-react";
 import {useRazorpay}  from "react-razorpay";
 import api from "./Api"
 import { useAuth } from '../../store/auth';
+import { useNavigate } from "react-router-dom";
 
-function Pricing() {
+function Pricing({amt, uses}) {
   const Razorpay = useRazorpay();
+  const navigate = useNavigate()
   const {user} = useAuth()
 
   const RAZORPAY_KEY_ID = "rzp_live_9YDNdvLxBLmTAZ";
 
   const data = {
-    amount: 20,
+    amount: amt,
     currency: "INR",
     receipt: "saifkhan",
     note: {
@@ -22,100 +24,104 @@ function Pricing() {
 
   
   const handlePayment = async () => {
-    try {
-      // Make the API call to backend
-      const order = await api.post("/payment", {
-        amount: 100,
-        currency: "INR",
-        receipt: "saifkhan",
-        note: {
-          "description": "best for jweller designer",
-          "access": "for 1 month"
-        }
-      }
-    );
-      console.log("order", order)
-    // add option for the payment gateway it can be dynamic if you want 
-    // we can use prop drilling to make it dynamic
-    console.log(order.data.amount)
-    console.log(order.data.currency)
-    console.log(order.data.id)
-      const options = {
-        key: RAZORPAY_KEY_ID,
-        amount: order.data.amount,
-        currency: order.data.currency,
-        name: "Jeweallity", // Add company details
-        description: "Payment for your order", // Add order details
-        order_id: order.data.id,
-        handler: async (response) => {
-          console.log("1",response)
-          try {
-            await fetch("https://back-alpha-amber.vercel.app/verify-payment", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-              }),
-            });
-            // Add onPaymentSuccessfull function here
-            alert("Payment successful!");
-
-           await api.post("/subscription", {subscription: "Bussiness version",credits: 300, email: user?.userData?.email}).then((res)=>{
-            console.log(res.data)
-           }).catch((err)=>{
-            console.log("error in stroing subscription", err)
-           })
-
-          } catch (err) {
-            // Add onPaymentUnSuccessfull function here
-            alert("Payment failed: " + err.message);
+    if(user?.userData?.verified==false){
+      navigate("/register-info")
+    }else{
+      try {
+        // Make the API call to backend
+        const order = await api.post("/payment", {
+          amount: amt,
+          currency: "INR",
+          receipt: "saifkhan",
+          note: {
+            "description": "best for jweller designer",
+            "access": "for 1 month"
           }
-        },
-        prefill: {
-          name: "saif khan", // add customer details
-          email: "saifkhan77806@gmail.com", // add customer details
-          contact: "9833754741", // add customer details
-        },
-        notes: {
-          address: "Razorpay Corporate Office",
-        },
-        theme: {
-    // you can change the gateway color from here according to your
-    // application theme
-          color: "#284e1f",
-        },
-      };
-
-
-      console.log(options)
-      const rzpay = new window.Razorpay(options);
-      // this will open razorpay window for take the payment in the frontend
-      // under the hood it use inbuild javascript windows api 
-      rzpay.open(options);
-
-      console.log(rzpay)
-
-    } catch (err) {
-      console.log("Error creating order: ", err)
-      alert("Error creating order: " + err.message);
+        }
+      );
+        console.log("order", order)
+      // add option for the payment gateway it can be dynamic if you want 
+      // we can use prop drilling to make it dynamic
+      console.log(order.data.amount)
+      console.log(order.data.currency)
+      console.log(order.data.id)
+        const options = {
+          key: RAZORPAY_KEY_ID,
+          amount: order.data.amount,
+          currency: order.data.currency,
+          name: "Jeweallity", // Add company details
+          description: "Payment for your order", // Add order details
+          order_id: order.data.id,
+          handler: async (response) => {
+            console.log("1",response)
+            try {
+              await fetch(`${import.meta.env.VITE_BACKEND_URL}/verify-payment`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                }),
+              });
+              // Add onPaymentSuccessfull function here
+              alert("Payment successful!");
+  
+             await api.post("/subscription", {subscription: uses ,credits: 300, email: user?.userData?.email}).then((res)=>{
+              console.log(res.data)
+             }).catch((err)=>{
+              console.log("error in stroing subscription", err)
+             })
+  
+            } catch (err) {
+              // Add onPaymentUnSuccessfull function here
+              alert("Payment failed: " + err.message);
+            }
+          },
+          prefill: {
+            name: user?.userData?.name, // add customer details
+            email: user?.userData?.email, // add customer details
+            contact: user?.userData?.phone, // add customer details
+          },
+          notes: {
+            address: "Razorpay Corporate Office",
+          },
+          theme: {
+      // you can change the gateway color from here according to your
+      // application theme
+            color: "#284e1f",
+          },
+        };
+  
+  
+        console.log(options)
+        const rzpay = new window.Razorpay(options);
+        // this will open razorpay window for take the payment in the frontend
+        // under the hood it use inbuild javascript windows api 
+        rzpay.open(options);
+  
+        console.log(rzpay)
+  
+      } catch (err) {
+        console.log("Error creating order: ", err)
+        alert("Error creating order: " + err.message);
+      }
     }
   };
 
   return (
     <Card className=' m-auto max-w-sm shadow-2xl ml-10 my-10'>
       <h5 className="mb-4 text-xl font-medium text-gray-500 dark:text-gray-400">
-        Bussiness version
+       {uses}
         <br />
         monthly creation
         </h5>
       <div className="flex items-baseline text-gray-900 dark:text-white">
-        <span className="text-3xl font-semibold">$</span>
-        <span className="text-5xl font-extrabold tracking-tight">49</span>
+        <span className="text-3xl font-semibold">Rs</span>
+        <span className="text-5xl font-extrabold tracking-tight">{amt}</span>
         <span className="ml-1 text-xl font-normal text-gray-500 dark:text-gray-400">/month</span>
       </div>
       <ul className="my-7 space-y-5">

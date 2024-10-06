@@ -34,7 +34,7 @@ const ProInfo = () => {
             <span className='luxuria my-3 font-bold'>Country</span>
             <input type="text" className='py-2 shadow-lg rounded-md pl-2 border border-gray-500 outline-none poppins mb-4' readOnly value={user?.userData?.country ? user?.userData?.country: ""} />
             <span className='luxuria my-3 font-bold'>Subscription</span>
-            <input type="text" className='py-2 shadow-lg rounded-md pl-2 border border-gray-500 outline-none poppins mb-4' readOnly value="Monthly Basic version" />
+            <input type="text" className='py-2 shadow-lg rounded-md pl-2 border border-gray-500 outline-none poppins mb-4' readOnly value={user?.userData?.subscription ? user?.userData?.subscription: ""} />
         </div>
    </div>
    </>
