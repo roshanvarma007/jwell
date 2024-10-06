@@ -10,11 +10,15 @@ import Logo from "./Logo";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "./Api";
+import { useAuth } from "../../store/auth";
 
 function RegisterInfo() {
     const navigate = useNavigate()
 
-    const [userData, setUserData] = useState({
+    const {userData} = useAuth()
+
+    const [userDatas, setUserDatas] = useState({
         firstName: "",
         lastName: "",
         password: "",
@@ -23,39 +27,40 @@ function RegisterInfo() {
     })
 
     const handlechange = (e) => {
-        setUserData({ ...userData, [e.target.name]: e.target.value })
+        setUserDatas({ ...userDatas, [e.target.name]: e.target.value })
     }
     
 
-    useEffect(()=>{
-        axios.get("http://localhost:3000/linkedin/success",{ withCredentials: true}).then((res)=>{
-          setUserData(res.data)
-          console.log(res.data?.logtype)
-          if(res.data.logtype=="login"){
-            navigate("/")
-          }
-        })
-      },[])
+    // useEffect(()=>{
+    //     axios.get("http://localhost:3000/linkedin/success",{ withCredentials: true}).then((res)=>{
+    //       setUserDatas(res.data)
+    //       console.log(res.data?.logtype)
+    //       if(res.data.logtype=="login"){
+    //         navigate("/")
+    //       }
+    //     })
+    //   },[])
+
+    console.log(userData?.type.id)
 
     const submit = (e) => {
         e.preventDefault()
-        console.log(userData)
+        console.log(userDatas)
 
-        axios.post(`http://localhost:3000/setinfo/${userData?.type.id}`, userData).then((res)=>{
+        api.post(`/setinfo/${userData?.type.id}`, userDatas).then((res)=>{
             console.log(res.data)
         }).catch((err)=>{
             console.log(err)
         })
 
-        axios.post(`http://localhost:3000/send-otp`, {email: userData?.type.email}).then((res)=>{
+        api.post(`/send-otp`, {email: userData?.type?.email}).then((res)=>{
             console.log(res.data)
         }).catch((err)=>{
             console.log(err)
         })
-
         
 
-        navigate("/verify-id", )
+        navigate(`/verify-id/${userData?.type?.email}` )
 
     }
 
@@ -90,7 +95,7 @@ function RegisterInfo() {
                                     placeholder="First Name"
                                     className=" !border-t-blue-gray-200 focus:!border-t-gray-900  bg-white shadow-lg"
                                     name="firstName"
-                                    value={userData?.firstName}
+                                    value={userDatas?.firstName}
                                     onChange={(e) => { handlechange(e) }}
                                     required
                                     labelProps={{
@@ -111,7 +116,7 @@ function RegisterInfo() {
                                     placeholder="Last name"
                                     className=" !border-t-blue-gray-200 focus:!border-t-gray-900   bg-white shadow-lg"
                                     name="lastName"
-                                    value={userData?.lastName}
+                                    value={userDatas?.lastName}
                                     onChange={(e) => { handlechange(e) }}
                                     required
                                     labelProps={{
@@ -132,7 +137,7 @@ function RegisterInfo() {
                             maxLength={10}
                             className=" !border-t-blue-gray-200 focus:!border-t-gray-900  bg-white shadow-lg"
                             name="password"
-                            value={userData?.password}
+                            value={userDatas?.password}
                             onChange={(e) => { handlechange(e) }}
                             required
                             labelProps={{
@@ -151,7 +156,7 @@ function RegisterInfo() {
                             maxLength={10}
                             className=" !border-t-blue-gray-200 focus:!border-t-gray-900  bg-white shadow-lg"
                             name="phone"
-                            value={userData?.phone}
+                            value={userDatas?.phone}
                             onChange={(e) => { handlechange(e) }}
                             required
                             labelProps={{
@@ -167,7 +172,7 @@ function RegisterInfo() {
                             placeholder="Country"
                             className=" !border-t-blue-gray-200 focus:!border-t-gray-900  bg-white shadow-lg"
                             name="country"
-                            value={userData?.country}
+                            value={userDatas?.country}
                             onChange={(e) => { handlechange(e) }}
                             required
                             labelProps={{

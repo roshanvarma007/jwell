@@ -6,6 +6,7 @@ import axios from 'axios';
 import api from './Api';
 import { useAuth } from '../../store/auth';
 import TulipBtn from './TulipBtn';
+import ConfirmModal from './ConfirmModal';
 
 
 const TextImg = () => {
@@ -26,6 +27,10 @@ const TextImg = () => {
   const [message, setMessage] = useState("Generate")
   const [enhce, setEnhce]= useState("Enhance Promt")
   const [disable, setDisable] = useState(false)
+
+// if(user?.userData?.credits==10065){
+//   confirm("Do You send review")
+// }
 
   const storeHistory = (imgurl, prompts, email) =>{
     api.post("/history",{imgurl, prompts, email}).then((res)=>{
@@ -130,10 +135,16 @@ const TextImg = () => {
     setPrompt({ ...prompt, noImG: e })
   }
 
+  const dont = localStorage.getItem("dont")
 
+  console.log("dont", dont)
 
   return (
     <>
+    {
+       dont == null && <ConfirmModal user={user?.userData?.credits}/>
+    }
+
       <div className='pt-[140px]'></div>
 
       <div className='absolute left-5 flex items-center'><FaArrowLeft /><Link to="/ai/img-img">Images to Images</Link></div>

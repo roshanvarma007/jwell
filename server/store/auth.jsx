@@ -21,10 +21,12 @@ export const Authprovider = ({children}) =>{
   useLayoutEffect(()=>{
     const token = localStorage.getItem("token")
 
+    
+
     if(token!=undefined || token){
      api.post("/verify-token", {token}).then((res)=>{
           console.log("user found", res.data)
-          setUserData()
+          setUserData(res.data?.user?.id)
           api.get(`/userid/${res.data?.user?.id?.type?.email}`).then((res)=>{
                console.log("user founded of innner api",res.data)
                setUser(res.data)
@@ -88,7 +90,7 @@ export const Authprovider = ({children}) =>{
  
 
   
-     return <AuthContext.Provider value={{ userData, user, updateCredits, credit, userDatas, storeUser, logout}}>
+     return <AuthContext.Provider value={{ userData, user, updateCredits, credit, userDatas, storeUser, logout, tokenss}}>
             {children}
             </AuthContext.Provider>
 

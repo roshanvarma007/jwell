@@ -38,7 +38,6 @@ const Navbar = () => {
 
   const { user } = useAuth()
 
-
   return (
     <>
       <nav className='fixed w-full z-30 top-0'>

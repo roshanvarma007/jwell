@@ -24,12 +24,15 @@ const Client = () => {
   
   const [user,setUser] = useState()
 
+  const {userData} = useAuth()
 
+  console.log(userData)
 
   // console.log("userdata", userData)
-  // if(userData?.logtype=="register"){
-  //   navigate("/register-info")
-  // }
+  if(userData?.logtype=="register"){
+    navigate("/register-info")
+    console.log(true)
+  }
 
   // if(userData?.logtype=="user already exist"){
   //   window.location.href = 'http://localhost:3000/logout';

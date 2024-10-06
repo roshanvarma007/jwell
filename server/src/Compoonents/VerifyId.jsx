@@ -11,13 +11,13 @@ const VerifyId = () => {
     const params = useParams()
     console.log("our params", params.email)
 
-    useEffect(()=>{
-        api.post(`/send-otp`, {email: params?.email}).then((res)=>{
-            console.log(res.data)
-        }).catch((err)=>{
-            console.log(err)
-        })
-    },[])
+    // useEffect(()=>{
+    //     api.post(`/send-otp`, {email: params?.email}).then((res)=>{
+    //         console.log(res.data)
+    //     }).catch((err)=>{
+    //         console.log(err)
+    //     })
+    // },[])
 
     const verifyotp = (e) =>{
         e.preventDefault()

@@ -14,13 +14,14 @@ const Post = () => {
     const [texts,setTexts] = useState()
     const [src,setSrc] = useState()
     const [edit,setEdit] = useState(true)
+  
 
     const para = document.getElementById("para")
     useEffect(()=>{
       console.log(para)
       if(src){
         const imgTag = document.createElement('img');
-        imgTag.src = `https://back-alpha-amber.vercel.app/public/${src}`
+        imgTag.src = src
         imgTag.className = "w-[70%] h-[300px] mx-auto rounded-xl shadow-xl my-5"
         para.appendChild(imgTag)
       }
@@ -36,19 +37,37 @@ const Post = () => {
       })
     }
 
-    const onDrop = useCallback(acceptedFiles => {
 
-      const data = new FormData();
-      data.append('image', acceptedFiles[0])
-      // Do something with the files
-      console.log(acceptedFiles[0])
-      api.post("/upload-blog",data).then((res)=>{
-        console.log(res.data.file)
-        setSrc(res.data.file)
-      }).catch((er)=>{
-        console.log(er)
-      })
-    }, [])
+    const urls = "https://back-alpha-amber.vercel.app/upload"
+    const onDrop = async(acceptedFiles) => {
+
+      const datass = new FormData();
+      datass.append('image', acceptedFiles[0]);
+      
+      const opts = {
+        method: "POST",
+        body: datass,
+      }
+      
+      await fetch(urls, opts)
+        .then((response) => {
+          console.log('Full response:', response);  // Log full response
+          if (!response.ok) {
+            throw new Error(`Network response was not ok. Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log('Response data:', data);  // Log the parsed response body
+          setSrc(data.fileUrl)
+        })
+        .catch((err) => {
+          console.error('Error:', err);  // Log any errors caught
+        });
+      
+      
+    }
+
     const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
 
 
@@ -107,6 +126,7 @@ const Post = () => {
         </div>
        :
           <div className='px-10 w-[600px] h-[200px] bg-light my-10 mx-auto rounded-lg shadow-xl flex justify-center items-center flex-col max-md:w-[200px]'>
+
             <IoCloudUpload  className='text-[70px] ac-color drop-shadow-md animate-bounce'/>
             <p className='poppins italic font-medium'>upload here through Drag 'n drop </p>
           </div>

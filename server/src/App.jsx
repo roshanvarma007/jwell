@@ -19,6 +19,7 @@ import History from './Compoonents/History'
 import Userdata from './Compoonents/Userdata'
 import Post from './Compoonents/Post'
 import GetBlog from './Compoonents/GetBlog'
+import PostReview from './Compoonents/PostReview'
 
 function App() {
 
@@ -45,6 +46,7 @@ function App() {
       <Route path='/admin/user/:email' element={<Userdata />}/>
       <Route path='/admin/post' element={<Post />}/>
       <Route path="/getblog/:id" element={<GetBlog />}/>
+      <Route path='/post-review' element={<PostReview />}/>
     </Routes>
     </div>
     </div>

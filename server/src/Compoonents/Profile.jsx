@@ -22,6 +22,8 @@ import url from "../assets/proImg"
 
   const { user, logout } = useAuth()
 
+  const [token,setToken] = useState(user)
+
 
   
   return (
@@ -64,7 +66,8 @@ import url from "../assets/proImg"
           navigate("/profile-info")
         }}>See more</button>
         <button className='mx-3 ac-bg px-5 py-4 font-semibold hover:bg-[#284e1f] rounded-full transition-all text-white' onClick={()=>{
-          logout()
+        logout()
+        // window.location.href = "https://server-ten-orcin.vercel.app"
         }}>Logout</button>
       </div>
       </div>

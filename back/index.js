@@ -1,13 +1,15 @@
 const express = require('express')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
-const multer = require("multer")
+// const multer = require("multer")
 const cookieSession = require('cookie-session')
 const app = express()
 const cors = require('cors')
 const jwt = require('jsonwebtoken')
 const User = require('./schema/UserSchema')
+const Review = require('./schema/ReviewSchema')
 const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser');
 const axios = require('axios')
 const { sendmail } = require('./sendOtp')
 const otpGenerator = require('otp-generator');
@@ -24,22 +26,50 @@ const {sendSubscription} = require("./sendSubscription")
 const Blog = require('./schema/BlogSchema')
 const Contact = require('./schema/ContactSchema')
 const { errorMonitor } = require('stream')
+const { uploadMultiple } = require('./middlware/imageUploader')
 
 // This razorpayInstance will be used to
 // access any resource from razorpay
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) =>{
-        cb(null, "public/")
-    },
-    filename: (req,file,cb) =>{
-        cb(null, file.fieldname + "_" + Date.now() + path.extname(file.originalname))
-    }
-})
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) =>{
+//         cb(null, "public/")
+//     },
+//     filename: (req,file,cb) =>{
+//         cb(null, file.fieldname + "_" + Date.now() + path.extname(file.originalname))
+//     }
+// })
 
-const upload = multer({
-    storage: storage
-})
+// const upload = multer({
+//     storage: storage
+// })
+
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const multer = require('multer');
+
+// Cloudinary config
+cloudinary.config({
+    cloud_name: "disb0qkhr",
+    api_key: "965223264892684",
+    api_secret: "U_vXLOAlOxBFiJNLdW5WepoYjjs",
+  });
+
+// Cloudinary storage setup for multer
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'your_folder_name', // Specify the folder in Cloudinary
+    format: async (req, file) => 'png', // Support formats like jpg, png, etc.
+    public_id: (req, file) => file.originalname.split('.')[0], // Use original filename as public ID
+  },
+});
+
+// Multer upload middleware
+const upload = multer({ storage: storage });
+
+// Route for handling image upload
+
 
 const razorpayInstance = new Razorpay({
     // Replace with your key_id
@@ -52,6 +82,17 @@ let otp
 let imageId
 const RAZORPAY_KEY_ID = "rzp_live_9YDNdvLxBLmTA"
 const RAZORPAY_KEY_SECRET = "PCfeCF3NKFQCIRwWIRBzwtQX"
+
+
+// cloudinary.config({
+//     cloud_name: "disb0qkhr",
+//     api_key: "965223264892684",
+//     api_secret: "U_vXLOAlOxBFiJNLdW5WepoYjjs",
+//   });
+
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}))
 
 
 // initialiePassport(passport);
@@ -146,6 +187,15 @@ app.use(express.json())
 
 // Other middleware and routes...
 
+app.post("/uploads", uploadMultiple, (req,res)=>{
+    res.status(200).send({
+        message: "file uploaded successfully",
+        data: req.files, 
+        success: true
+
+    })
+})
+
 app.get('/', (req, res) => {
     res.send(
         "<button><a href='/auth'>Login with google</a></button><br/><button><a href='/linkedin'>Login with linkedin</a></button> <br /> <button><a href='/logout'>Logout</a></button>"
@@ -191,6 +241,22 @@ app.get('/linkedin/success', (req, res) => {
 app.get('/linkedin/failure', (req, res) => {
     res.status(404).send("Error")
 })
+
+app.post('/upload', upload.single('image'), (req, res) => {
+    try {
+      // File has been uploaded to Cloudinary at this point
+      console.log(req.file); // The file info stored in Cloudinary
+  
+      res.status(200).json({
+        message: 'File uploaded successfully',
+        fileUrl: req.file.path, // The URL of the uploaded file on Cloudinary
+      });
+    } catch (error) {
+      console.error('Error during upload:', error);
+      res.status(500).json({ error: 'Image upload failed' });
+    }
+  });
+  
 
 
 app.post("/verify-token",async(req,res)=>{
@@ -261,6 +327,7 @@ app.post("/verfiy-otp", async(req,res)=>{
           success = true;
           console.log(success);  
        res.status(200).send({success})
+       otp = null
     }else{
         console.log("invalid otp");
         res.status(200).send({msg: "invalid otp"});
@@ -746,10 +813,10 @@ app.get("/byemail/:email", async(req,res)=>{
     res.status(200).send({user})
 })
 
-app.post("/upload-blog",upload.single('image'), (req,res)=>{
-    console.log(req.file)
-    res.status(200).send({msg: "img stored in multer", file: req.file?.filename})
-})
+// app.post("/upload-blog",upload.single('image'), (req,res)=>{
+//     console.log(req.file)
+//     res.status(200).send({msg: "img stored in multer", file: req.file?.filename})
+// })
 
 app.post("/post-blog",async(req,res)=>{
     console.log(req.body)
@@ -788,6 +855,54 @@ app.get("/contact", async(req,res)=>{
 
     res.status(200).send({contacts})
 })
+
+app.post("/post-review",async (req,res)=>{
+    try{
+        const { name, email, rates, message } = req.body
+        const reviewData = await Review({ name, email, rates, message })
+        await reviewData.save()
+
+        res.status(200).send({msg: "review stored successfully" })
+    }catch(err){
+        res.status(404).send(err)
+    }
+})
+
+
+app.get("/get-review",async(req,res)=>{
+    const reviewData = await Review.find()
+  
+    res.status(200).send(reviewData)
+  })
+
+
+app.delete("/delete-review/:id",async(req,res)=>{
+    const {id} = req.params
+
+    await Review.findByIdAndDelete(id)
+
+    res.status(200).send({msg: "review deleted successfully !"})
+})
+  
+// const mongoose = require('mongoose');
+app.post("/update-review", async (req, res) => {
+    const { id } = req.body;
+
+  
+    try {
+         await Review.findByIdAndUpdate(id,{approve: true})
+        // if (updatedReview.modifiedCount === 0) {
+        //     return res.status(404).send({ msg: "Review not found!" });
+        // }
+
+        res.status(200).send({ msg: "Review updated successfully!" });
+    } catch (err) {
+        console.error("Error during update:", err);
+        res.status(500).send({ msg: "Server error" });
+    }
+});
+
+
 
 
 app.get('/auth/callback/failure', (req, res) => {
